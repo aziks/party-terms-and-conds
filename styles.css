@@ -1,0 +1,578 @@
+/* ============================================================
+   RESET Y VARIABLES
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:          #000000;
+  --bg-reject:   #060000;
+  --bg-director: #020409;
+  --text:        #d8d8d8;
+  --text-dim:    #555555;
+  --text-faint:  #2a2a2a;
+  --accent:      #ffffff;
+  --error:       #cc2200;
+  --error-glow:  #ff3300;
+  --success:     #00cc66;
+  --director-hl: #1a4080;
+  --director-dim:#0a1e3a;
+  --bar-h:       42px;
+  --mono:        'Courier New', Courier, monospace;
+}
+
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   BARRA DE ESTADO FIJA
+   ============================================================ */
+#status-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--bar-h);
+  background: rgba(0, 0, 0, 0.97);
+  border-bottom: 1px solid #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  padding: 0 20px;
+  text-align: center;
+  transition: border-color 0.4s;
+}
+
+#status-bar.all-accepted {
+  border-bottom-color: var(--success);
+}
+
+#status-bar.has-rejected {
+  border-bottom-color: var(--error);
+}
+
+#status-count {
+  color: var(--accent);
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+#main {
+  padding-top: var(--bar-h);
+}
+
+/* ============================================================
+   PANTALLA 1 — TÉRMINOS Y CONDICIONES
+   ============================================================ */
+#screen-tc {
+  display: block;
+}
+
+/* Cabecera del documento */
+.tc-header {
+  padding: 44px 24px 28px;
+  border-bottom: 1px solid #151515;
+  text-align: center;
+}
+
+.tc-institution {
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.tc-title {
+  font-size: 15px;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: var(--accent);
+}
+
+.tc-ref {
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 14px;
+  letter-spacing: 0.1em;
+}
+
+/* Cuerpo del documento */
+.tc-body {
+  padding: 36px 24px 16px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.tc-body p {
+  margin-bottom: 18px;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.tc-chapter {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 40px 0 16px;
+  padding-top: 20px;
+  border-top: 1px solid #111;
+}
+
+.tc-art {
+  margin-bottom: 26px;
+}
+
+.tc-art-num {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+/* Indicador de scroll */
+#scroll-hint {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  padding: 20px 24px 4px;
+  transition: opacity 0.6s ease;
+  animation: blink-slow 2.5s ease-in-out infinite;
+}
+
+@keyframes blink-slow {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.9; }
+}
+
+/* Zona de botones (oculta hasta scroll completo) */
+#action-zone {
+  padding: 28px 24px 56px;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+
+#action-zone.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tc-sign-line {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+/* Botones de acción */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 17px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, opacity 0.25s;
+}
+
+.btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.btn-accept {
+  color: var(--accent);
+  border-color: #444;
+}
+.btn-accept:not(:disabled):hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.btn-reject {
+  color: #444;
+  border-color: #1a1a1a;
+}
+.btn-reject:not(:disabled):hover {
+  color: var(--error);
+  border-color: #440000;
+}
+
+/* ============================================================
+   PANTALLA 2 — ESPERANDO AL RESTO
+   ============================================================ */
+#screen-waiting {
+  display: none;
+  min-height: calc(100vh - var(--bar-h));
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 28px;
+}
+
+.waiting-spinner {
+  font-size: 36px;
+  color: var(--text-dim);
+  margin-bottom: 36px;
+  display: inline-block;
+  animation: rotate 6s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.waiting-title {
+  font-size: 14px;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  line-height: 1.9;
+  color: var(--text);
+  max-width: 420px;
+}
+
+.waiting-progress {
+  margin-top: 28px;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+}
+
+/* ============================================================
+   PANTALLA 3 — RECHAZO
+   ============================================================ */
+#screen-rejected {
+  display: none;
+  min-height: calc(100vh - var(--bar-h));
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 28px;
+  background: var(--bg-reject);
+}
+
+.reject-code {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--error);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  animation: flicker 0.08s infinite alternate;
+}
+
+@keyframes flicker {
+  from { opacity: 1; }
+  to   { opacity: 0.82; }
+}
+
+.reject-title {
+  font-size: 20px;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  color: var(--error-glow);
+  text-transform: uppercase;
+  margin-bottom: 22px;
+  line-height: 1.4;
+}
+
+.reject-body {
+  font-size: 12px;
+  color: #882200;
+  max-width: 400px;
+  line-height: 1.9;
+  margin-bottom: 40px;
+}
+
+#countdown-num {
+  font-size: 72px;
+  color: var(--error-glow);
+  line-height: 1;
+  animation: throb 1s ease-in-out infinite;
+}
+
+@keyframes throb {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.6; }
+}
+
+#countdown-label {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: #551100;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   PANTALLA 4 — CELEBRACIÓN
+   ============================================================ */
+#screen-accepted {
+  display: none;
+  min-height: calc(100vh - var(--bar-h));
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.party-title {
+  font-size: 28px;
+  font-weight: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--success);
+  line-height: 1.5;
+  position: relative;
+  z-index: 10;
+  animation: emerge 1.2s ease-out both;
+}
+
+@keyframes emerge {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.party-sub {
+  margin-top: 18px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  position: relative;
+  z-index: 10;
+  animation: emerge 1.2s 0.4s ease-out both;
+}
+
+/* ============================================================
+   CANVAS DE CONFETI
+   ============================================================ */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ============================================================
+   MODO DIRECTOR
+   ============================================================ */
+#director-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg-director);
+  z-index: 500;
+  overflow-y: auto;
+  font-family: var(--mono);
+}
+
+#director-overlay.on { display: block; }
+
+/* Marca de agua del director */
+.dir-watermark {
+  position: fixed;
+  bottom: 12px;
+  right: 14px;
+  font-size: 8px;
+  letter-spacing: 0.5em;
+  color: #0a1e3a;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 501;
+}
+
+/* Encabezado */
+.dir-header {
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--director-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dir-header-title {
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #3366aa;
+  font-weight: normal;
+}
+
+.dir-badge {
+  font-size: 8px;
+  background: var(--director-dim);
+  color: #3366aa;
+  border: 1px solid var(--director-hl);
+  padding: 2px 9px;
+  letter-spacing: 0.2em;
+}
+
+/* Píldora de estado */
+.dir-pill {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  padding: 2px 9px;
+  border: 1px solid;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+.dir-pill-waiting  { color: #aaaa22; border-color: #444400; }
+.dir-pill-accepted { color: #22aa55; border-color: #004422; }
+.dir-pill-rejected { color: #aa2200; border-color: #440000; }
+
+/* Cuadrícula de stats */
+.dir-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+@media (max-width: 420px) {
+  .dir-grid { grid-template-columns: 1fr; }
+}
+
+.dir-card {
+  background: #030c1c;
+  border: 1px solid var(--director-dim);
+  padding: 14px;
+}
+
+.dir-card-wide { grid-column: 1 / -1; }
+
+.dir-card-title {
+  font-size: 8px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #1a3560;
+  margin-bottom: 14px;
+}
+
+.dir-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.dir-stat-label {
+  font-size: 10px;
+  color: #2a4a7a;
+}
+
+.dir-stat-val {
+  font-size: 22px;
+  color: #4488cc;
+}
+
+.dir-stat-val.danger { color: var(--error-glow); }
+.dir-stat-val.good   { color: var(--success); }
+
+/* Log de eventos */
+.dir-log {
+  height: 170px;
+  overflow-y: auto;
+  font-size: 10px;
+  color: #2a4a7a;
+  line-height: 1.9;
+}
+
+.dir-log::-webkit-scrollbar { width: 3px; }
+.dir-log::-webkit-scrollbar-track { background: transparent; }
+.dir-log::-webkit-scrollbar-thumb { background: var(--director-dim); }
+
+.log-line { border-bottom: 1px solid #040e1e; padding: 1px 0; }
+.log-connect    { color: #2255aa; }
+.log-disconnect { color: #333; }
+.log-accept     { color: #228855; }
+.log-reject     { color: #882200; }
+.log-system     { color: #886600; }
+
+/* Controles del director */
+.dir-controls {
+  padding: 0 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-dir {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-dir-accept { color: #225533; border-color: #112211; }
+.btn-dir-accept:hover { background: #112211; color: #33cc66; }
+
+.btn-dir-reject { color: #553322; border-color: #221111; }
+.btn-dir-reject:hover { background: #221111; color: #ff4422; }
+
+.btn-dir-reset  { color: #2a4060; border-color: #0a1a2a; }
+.btn-dir-reset:hover { background: #0a1a2a; color: #4488cc; }
+
+/* ============================================================
+   RESPONSIVE — ajustes móvil
+   ============================================================ */
+@media (max-width: 480px) {
+  body { font-size: 13px; }
+  .tc-title { font-size: 13px; }
+  .tc-body { padding: 28px 18px 12px; }
+  #action-zone { padding: 24px 18px 48px; }
+  .party-title { font-size: 22px; }
+  #countdown-num { font-size: 56px; }
+  .reject-title { font-size: 16px; }
+}
+
+/* ============================================================
+   TRANSICIONES ENTRE PANTALLAS
+   ============================================================ */
+.screen { transition: opacity 0.5s ease; }
